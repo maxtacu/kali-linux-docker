@@ -11,7 +11,7 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
         openssh-server pwgen sudo vim-tiny \
 	supervisor \
         net-tools \
-        lxde x11vnc xvfb \
+        lxde x11vnc xvfb autocutsel \
 	xfonts-base lwm xterm \
         nginx \
         python-pip python-dev build-essential \
