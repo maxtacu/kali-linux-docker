@@ -5,6 +5,11 @@ Docker image to provide HTML5 VNC interface to access Kali-Linux container LXDE 
 
 Quick Start
 -------------------------
+This Kali Linux Docker image provides a minimal base install of the latest version of the Kali Linux Rolling Distribution. 
+There are no tools added to this image, so you will need to install them yourself. For details about Kali Linux metapackages, 
+check https://www.kali.org/news/kali-linux-metapackages/
+
+Before start check Dockerfile to uncomment needed Kali Linux Metapackages
 
 Run the docker image and open port `6080`
 
@@ -31,6 +36,11 @@ docker run -it --rm -p 6080:80 -p 5900:5900 -e VNC_PASSWORD=mypassword <image-id
 ```
 
 A prompt will ask password either in the browser or vnc viewer.
+
+To get into bash of container
+```bash
+sudo docker exec -i -t <container-id> /bin/bash
+```
 
 P.S. If you would run container in cloud vm, run first bellow command to vm in cloud to create ssh tunnel 
 to your vm
