@@ -9,10 +9,10 @@ RUN apt-get -y update && apt-get -y dist-upgrade && apt-get clean \
     && apt-get install -y --no-install-recommends software-properties-common curl
 RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
         openssh-server pwgen sudo vim-tiny \
-	supervisor \
+	    supervisor \
         net-tools \
         lxde x11vnc xvfb autocutsel \
-	xfonts-base lwm xterm \
+	    xfonts-base lwm xterm \
         nginx \
         python-pip python-dev build-essential \
         mesa-utils libgl1-mesa-dri \
@@ -24,19 +24,20 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
 RUN apt-get update && apt-cache search kali-linux
 
 # For installing Kali metapackages uncomment needed lines
-#RUN apt-get istall kali-linux       # Kali Linux base system
-#RUN apt-get istall kali-linux-all       # Kali Linux - all packages
-#RUN apt-get istall kali-linux-forensic      # Kali Linux forensic tools
-#RUN apt-get istall kali-linux-full      # Kali Linux complete system
-#RUN apt-get istall kali-linux-gpu       # Kali Linux GPU tools
-#RUN apt-get istall kali-linux-nethunter         # Kali Linux Nethunter tools
-#RUN apt-get istall kali-linux-pwtools       # Kali Linux password cracking tools
-#RUN apt-get istall kali-linux-rfid      # Kali Linux RFID tools
-#RUN apt-get istall kali-linux-sdr       # Kali Linux SDR tools
-#RUN apt-get istall kali-linux-top10         # Kali Linux Top 10 tools
-#RUN apt-get istall kali-linux-voip      # Kali Linux VoIP tools
-#RUN apt-get istall kali-linux-web       # Kali Linux webapp assessment tools
-#RUN apt-get istall kali-linux-wireless      # Kali Linux wireless tools
+#RUN apt-get istall -y   \
+#        kali-linux  \               # Kali Linux base system
+#        kali-linux-all  \           # Kali Linux - all packages
+#        kali-linux-forensic \       # Kali Linux forensic tools
+#        kali-linux-full \           # Kali Linux complete system
+#        kali-linux-gpu  \           # Kali Linux GPU tools
+#        kali-linux-nethunter    \   # Kali Linux Nethunter tools
+#        kali-linux-pwtools  \       # Kali Linux password cracking tools
+#        kali-linux-rfid \           # Kali Linux RFID tools
+#        kali-linux-sdr  \           # Kali Linux SDR tools
+#        kali-linux-top10    \       # Kali Linux Top 10 tools
+#        kali-linux-voip \           # Kali Linux VoIP tools
+#        kali-linux-web  \           # Kali Linux webapp assessment tools
+#        kali-linux-wireless \       # Kali Linux wireless tools
 
 ENV TINI_VERSION v0.15.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
