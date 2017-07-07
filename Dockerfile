@@ -21,7 +21,24 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
 
-ENV TINI_VERSION v0.9.0
+RUN apt-get update && apt-cache search kali-linux
+
+# For installing Kali metapackages uncomment needed lines
+#RUN apt-get istall kali-linux       # Kali Linux base system
+#RUN apt-get istall kali-linux-all       # Kali Linux - all packages
+#RUN apt-get istall kali-linux-forensic      # Kali Linux forensic tools
+#RUN apt-get istall kali-linux-full      # Kali Linux complete system
+#RUN apt-get istall kali-linux-gpu       # Kali Linux GPU tools
+#RUN apt-get istall kali-linux-nethunter         # Kali Linux Nethunter tools
+#RUN apt-get istall kali-linux-pwtools       # Kali Linux password cracking tools
+#RUN apt-get istall kali-linux-rfid      # Kali Linux RFID tools
+#RUN apt-get istall kali-linux-sdr       # Kali Linux SDR tools
+#RUN apt-get istall kali-linux-top10         # Kali Linux Top 10 tools
+#RUN apt-get istall kali-linux-voip      # Kali Linux VoIP tools
+#RUN apt-get istall kali-linux-web       # Kali Linux webapp assessment tools
+#RUN apt-get istall kali-linux-wireless      # Kali Linux wireless tools
+
+ENV TINI_VERSION v0.15.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
 RUN chmod +x /bin/tini
 
