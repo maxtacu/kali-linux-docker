@@ -21,10 +21,8 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
     && apt-get autoremove \
     && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-cache search kali-linux
-
 # For installing Kali metapackages uncomment needed lines
-#RUN apt-get istall -y   \
+#RUN apt-get update && apt-cache search kali-linux && apt-get istall -y   \
 #        kali-linux  \               # Kali Linux base system
 #        kali-linux-all  \           # Kali Linux - all packages
 #        kali-linux-forensic \       # Kali Linux forensic tools
