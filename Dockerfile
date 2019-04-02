@@ -17,8 +17,8 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
         python-pip python-dev build-essential \
         mesa-utils libgl1-mesa-dri \
         dbus-x11 x11-utils \
-    && apt-get autoclean \
-    && apt-get autoremove \
+    && apt-get -y autoclean \
+    && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/*
 
 # For installing Kali metapackages uncomment needed lines
