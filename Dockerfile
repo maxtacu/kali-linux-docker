@@ -22,7 +22,7 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
     && rm -rf /var/lib/apt/lists/*
 
 # For installing Kali metapackages uncomment needed lines
-#RUN apt-get update && apt-cache search kali-linux && apt-get istall -y   \
+RUN apt-get update && apt-cache search kali-linux && apt-get install -y   \
 #        kali-linux  \               # Kali Linux base system
 #        kali-linux-all  \           # Kali Linux - all packages
 #        kali-linux-forensic \       # Kali Linux forensic tools
@@ -32,7 +32,7 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
 #        kali-linux-pwtools  \       # Kali Linux password cracking tools
 #        kali-linux-rfid \           # Kali Linux RFID tools
 #        kali-linux-sdr  \           # Kali Linux SDR tools
-#        kali-linux-top10    \       # Kali Linux Top 10 tools
+        kali-linux-top10    \       # Kali Linux Top 10 tools
 #        kali-linux-voip \           # Kali Linux VoIP tools
 #        kali-linux-web  \           # Kali Linux webapp assessment tools
 #        kali-linux-wireless \       # Kali Linux wireless tools
