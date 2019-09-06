@@ -4,7 +4,8 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-      #    volumes:
+    volumes:
+      - ./volumes/root:/root/host
     environment:
       - VNC_PASSWORD=CHANGEME!
     ports:
