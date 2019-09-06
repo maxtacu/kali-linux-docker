@@ -1,0 +1,18 @@
+version: '3'
+services:
+  ssh:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      #    volumes:
+    environment:
+      - VNC_PASSWORD=CHANGEME!
+    ports:
+      - "443:22"
+      # Free utility port for metasploit etc.
+      - "666:666"
+      # Uncomment to expose VNC (bad idea)
+      #- "80:80"
+      #- "5900:5900"
+
+

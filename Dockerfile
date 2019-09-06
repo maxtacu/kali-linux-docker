@@ -23,7 +23,7 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
 
 # For installing Kali metapackages uncomment needed lines
 RUN apt-get update && apt-cache search kali-linux && apt-get install -y   \
-        kali-linux-light kali-linux-top10 ncat stunnel
+        kali-linux-light kali-linux-top10 ncat stunnel mosh
 
 ENV TINI_VERSION v0.15.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
@@ -31,8 +31,13 @@ RUN chmod +x /bin/tini
 
 ADD image /
 RUN pip install setuptools wheel && pip install -r /usr/lib/web/requirements.txt
+# Add a command and control user for SSH
+RUN useradd -ms /usr/sbin/nologin ccc
+COPY authorized_keys_root /root/.ssh/authorized_keys
+COPY authorized_keys_ccc /home/ccc/.ssh/authorized_keys
 
-EXPOSE 80
+EXPOSE 22
+
 WORKDIR /root
 ENV HOME=/root \
     SHELL=/bin/bash
