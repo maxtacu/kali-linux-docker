@@ -23,7 +23,7 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
 
 # For installing Kali metapackages uncomment needed lines
 RUN apt-get update && apt-cache search kali-linux && apt-get install -y   \
-        kali-linux-light kali-linux-top10 ncat stunnel mosh
+        kali-linux-light kali-linux-top10 ncat stunnel mosh locales-all
 
 ENV TINI_VERSION v0.15.0
 ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/tini
