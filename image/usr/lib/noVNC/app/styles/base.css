@@ -1,8 +1,6 @@
 /*
  * noVNC base CSS
- * Copyright (C) 2012 Joel Martin
- * Copyright (C) 2016 Samuel Mannehed for Cendio AB
- * Copyright (C) 2016 Pierre Ossman for Cendio AB
+ * Copyright (C) 2019 The noVNC Authors
  * noVNC is licensed under the MPL 2.0 (see LICENSE.txt)
  * This file is licensed under the 2-Clause BSD license (see LICENSE.txt).
  */
@@ -57,6 +55,7 @@ html {
   width: 10px;
   height: 10px;
   border-radius: 2px;
+  box-shadow: -60px 10px 0 rgba(255, 255, 255, 0);
   animation: noVNC_spinner 1.0s linear infinite;
 }
 .noVNC_spinner::before {
@@ -84,8 +83,20 @@ html {
  * ----------------------------------------
  */
 
-input[type=input], input[type=password], input[type=number],
-input:not([type]), textarea {
+input:not([type]),
+input[type=date],
+input[type=datetime-local],
+input[type=email],
+input[type=month],
+input[type=number],
+input[type=password],
+input[type=search],
+input[type=tel],
+input[type=text],
+input[type=time],
+input[type=url],
+input[type=week],
+textarea {
   /* Disable default rendering */
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -99,7 +110,11 @@ input:not([type]), textarea {
   background: linear-gradient(to top, rgb(255, 255, 255) 80%, rgb(240, 240, 240));
 }
 
-input[type=button], input[type=submit], select {
+input[type=button],
+input[type=color],
+input[type=reset],
+input[type=submit],
+select {
   /* Disable default rendering */
   -webkit-appearance: none;
   -moz-appearance: none;
@@ -117,7 +132,10 @@ input[type=button], input[type=submit], select {
   vertical-align: middle;
 }
 
-input[type=button], input[type=submit] {
+input[type=button],
+input[type=color],
+input[type=reset],
+input[type=submit] {
   padding-left: 20px;
   padding-right: 20px;
 }
@@ -127,35 +145,72 @@ option {
   background: white;
 }
 
-input[type=input]:focus, input[type=password]:focus,
-input:not([type]):focus, input[type=button]:focus,
+input:not([type]):focus,
+input[type=button]:focus,
+input[type=color]:focus,
+input[type=date]:focus,
+input[type=datetime-local]:focus,
+input[type=email]:focus,
+input[type=month]:focus,
+input[type=number]:focus,
+input[type=password]:focus,
+input[type=reset]:focus,
+input[type=search]:focus,
 input[type=submit]:focus,
-textarea:focus, select:focus {
+input[type=tel]:focus,
+input[type=text]:focus,
+input[type=time]:focus,
+input[type=url]:focus,
+input[type=week]:focus,
+select:focus,
+textarea:focus {
   box-shadow: 0px 0px 3px rgba(74, 144, 217, 0.5);
   border-color: rgb(74, 144, 217);
   outline: none;
 }
 
 input[type=button]::-moz-focus-inner,
+input[type=color]::-moz-focus-inner,
+input[type=reset]::-moz-focus-inner,
 input[type=submit]::-moz-focus-inner {
   border: none;
 }
 
-input[type=input]:disabled, input[type=password]:disabled,
-input:not([type]):disabled, input[type=button]:disabled,
-input[type=submit]:disabled, input[type=number]:disabled,
-textarea:disabled, select:disabled {
+input:not([type]):disabled,
+input[type=button]:disabled,
+input[type=color]:disabled,
+input[type=date]:disabled,
+input[type=datetime-local]:disabled,
+input[type=email]:disabled,
+input[type=month]:disabled,
+input[type=number]:disabled,
+input[type=password]:disabled,
+input[type=reset]:disabled,
+input[type=search]:disabled,
+input[type=submit]:disabled,
+input[type=tel]:disabled,
+input[type=text]:disabled,
+input[type=time]:disabled,
+input[type=url]:disabled,
+input[type=week]:disabled,
+select:disabled,
+textarea:disabled {
   color: rgb(128, 128, 128);
   background: rgb(240, 240, 240);
 }
 
-input[type=button]:active, input[type=submit]:active,
+input[type=button]:active,
+input[type=color]:active,
+input[type=reset]:active,
+input[type=submit]:active,
 select:active {
   border-bottom-width: 1px;
   margin-top: 3px;
 }
 
 :root:not(.noVNC_touch) input[type=button]:hover:not(:disabled),
+:root:not(.noVNC_touch) input[type=color]:hover:not(:disabled),
+:root:not(.noVNC_touch) input[type=reset]:hover:not(:disabled),
 :root:not(.noVNC_touch) input[type=submit]:hover:not(:disabled),
 :root:not(.noVNC_touch) select:hover:not(:disabled) {
   background: linear-gradient(to top, rgb(255, 255, 255), rgb(250, 250, 250));
@@ -215,36 +270,44 @@ select:active {
  */
 
 #noVNC_fallback_error {
-  position: fixed;
   z-index: 1000;
-  left: 50%;
-  transform: translate(-50%, -50px);
+  visibility: hidden;
+}
+#noVNC_fallback_error.noVNC_open {
+  visibility: visible;
+}
+
+#noVNC_fallback_error > div {
+  max-width: 90%;
+  padding: 15px;
+
   transition: 0.5s ease-in-out;
 
-  visibility: hidden;
+  transform: translateY(-50px);
   opacity: 0;
-
-  top: 60px;
-  padding: 15px;
-  width: auto;
 
   text-align: center;
   font-weight: bold;
-  word-wrap: break-word;
   color: #fff;
 
   border-radius: 10px;
   box-shadow: 6px 6px 0px rgba(0, 0, 0, 0.5);
   background: rgba(200,55,55,0.8);
 }
-#noVNC_fallback_error.noVNC_open {
-  transform: translate(-50%, 0);
-  visibility: visible;
+#noVNC_fallback_error.noVNC_open > div {
+  transform: translateY(0);
   opacity: 1;
 }
 
 #noVNC_fallback_errormsg {
   font-weight: normal;
+}
+
+#noVNC_fallback_errormsg .noVNC_message {
+  display: inline-block;
+  text-align: left;
+  font-family: monospace;
+  white-space: pre-wrap;
 }
 
 #noVNC_fallback_error .noVNC_location {
@@ -254,13 +317,16 @@ select:active {
 }
 
 #noVNC_fallback_error .noVNC_stack {
+  max-height: 50vh;
   padding: 10px;
   margin: 10px;
   font-size: 0.8em;
   text-align: left;
+  font-family: monospace;
   white-space: pre;
   border: 1px solid rgba(0, 0, 0, 0.5);
   background: rgba(0, 0, 0, 0.2);
+  overflow: auto;
 }
 
 /* ----------------------------------------
@@ -392,6 +458,36 @@ select:active {
   padding: 0 5px 0 10px;
 }
 
+/* Control bar hint */
+#noVNC_control_bar_hint {
+  position: fixed;
+  left: calc(100vw - 50px);
+  right: auto;
+  top: 50%;
+  transform: translateY(-50%) scale(0);
+  width: 100px;
+  height: 50%;
+  max-height: 600px;
+
+  visibility: hidden;
+  opacity: 0;
+  transition: 0.2s ease-in-out;
+  background: transparent;
+  box-shadow: 0 0 10px black, inset 0 0 10px 10px rgba(110, 132, 163, 0.8);
+  border-radius: 10px;
+  transition-delay: 0s;
+}
+#noVNC_control_bar_anchor.noVNC_right #noVNC_control_bar_hint{
+  left: auto;
+  right: calc(100vw - 50px);
+}
+#noVNC_control_bar_hint.noVNC_active {
+  visibility: visible;
+  opacity: 1;
+  transition-delay: 0.2s;
+  transform: translateY(-50%) scale(1);
+}
+
 /* General button style */
 .noVNC_button {
   display: block;
@@ -415,11 +511,15 @@ select:active {
   padding-top: 5px;
   padding-bottom: 3px;
 }
-:root:not(.noVNC_touch) .noVNC_button.noVNC_selected:hover {
+/* Android browsers don't properly update hover state if touch events
+ * are intercepted, but focus should be safe to display */
+:root:not(.noVNC_touch) .noVNC_button.noVNC_selected:hover,
+.noVNC_button.noVNC_selected:focus {
   border-color: rgba(0, 0, 0, 0.4);
   background: rgba(0, 0, 0, 0.2);
 }
-:root:not(.noVNC_touch) .noVNC_button:hover {
+:root:not(.noVNC_touch) .noVNC_button:hover,
+.noVNC_button:focus {
   background: rgba(255, 255, 255, 0.2);
 }
 .noVNC_button.noVNC_hidden {
@@ -535,7 +635,7 @@ select:active {
 }
 
 /* Extra manual keys */
-:root:not(.noVNC_connected) #noVNC_extra_keys {
+:root:not(.noVNC_connected) #noVNC_toggle_extra_keys_button {
   display: none;
 }
 
@@ -545,17 +645,17 @@ select:active {
   padding: 0 10px;
 }
 
-/* XVP Shutdown/Reboot */
-:root:not(.noVNC_connected) #noVNC_xvp_button {
+/* Shutdown/Reboot */
+:root:not(.noVNC_connected) #noVNC_power_button {
   display: none;
 }
-#noVNC_xvp {
+#noVNC_power {
 }
-#noVNC_xvp_buttons {
+#noVNC_power_buttons {
   display: none;
 }
 
-#noVNC_xvp input[type=button] {
+#noVNC_power input[type=button] {
   width: 100%;
 }
 
@@ -585,6 +685,16 @@ select:active {
 }
 #noVNC_setting_path {
   width: 100px;
+}
+
+/* Version */
+
+.noVNC_version_wrapper {
+  font-size: small;
+}
+
+.noVNC_version {
+  margin-left: 1rem;
 }
 
 /* Connection Controls */
@@ -736,19 +846,23 @@ select:active {
  * ----------------------------------------
  */
 
-#noVNC_password_dlg {
+#noVNC_credentials_dlg {
   position: relative;
 
   transform: translateY(-50px);
 }
-#noVNC_password_dlg.noVNC_open {
+#noVNC_credentials_dlg.noVNC_open {
   transform: translateY(0);
 }
-#noVNC_password_dlg ul {
+#noVNC_credentials_dlg ul {
   list-style: none;
   margin: 0px;
   padding: 0px;
 }
+.noVNC_hidden {
+  display: none;
+}
+
 
 /* ----------------------------------------
  * Main Area
@@ -774,6 +888,7 @@ select:active {
   justify-content: center;
   flex-direction: column;
 }
+:root.noVNC_loading #noVNC_transition,
 :root.noVNC_connecting #noVNC_transition,
 :root.noVNC_disconnecting #noVNC_transition,
 :root.noVNC_reconnecting #noVNC_transition {
@@ -805,27 +920,6 @@ select:active {
   left: -40px;
   z-index: -1;
   ime-mode: disabled;
-}
-
-/* HTML5 Canvas */
-#noVNC_screen {
-  display: flex;
-  width: 100%;
-  height: 100%;
-  overflow: auto;
-  background-color: rgb(40, 40, 40);
-}
-:root:not(.noVNC_connected) #noVNC_screen {
-  display: none;
-}
-
-/* Do not set width/height for VNC_canvas or incorrect
- * scaling will occur. Canvas size depends on remote VNC
- * settings and noVNC settings. */
-#noVNC_canvas {
-  margin: auto;
-  /* IE miscalculates width without this :( */
-  flex-shrink: 0;
 }
 
 /*Default noVNC logo.*/

@@ -1,10 +1,10 @@
-// requires local modules: util
-/* jshint expr: true */
+/* eslint-disable no-console */
+const expect = chai.expect;
 
-var assert = chai.assert;
-var expect = chai.expect;
+import * as Log from '../core/util/logging.js';
+import { encodeUTF8, decodeUTF8 } from '../core/util/strings.js';
 
-describe('Utils', function() {
+describe('Utils', function () {
     "use strict";
 
     describe('logging functions', function () {
@@ -17,118 +17,73 @@ describe('Utils', function() {
         });
 
         afterEach(function () {
-           console.log.restore();
-           console.debug.restore();
-           console.warn.restore();
-           console.error.restore();
-           console.info.restore();
+            console.log.restore();
+            console.debug.restore();
+            console.warn.restore();
+            console.error.restore();
+            console.info.restore();
+            Log.init_logging();
         });
 
         it('should use noop for levels lower than the min level', function () {
-            Util.init_logging('warn');
-            Util.Debug('hi');
-            Util.Info('hello');
+            Log.init_logging('warn');
+            Log.Debug('hi');
+            Log.Info('hello');
             expect(console.log).to.not.have.been.called;
         });
 
         it('should use console.debug for Debug', function () {
-            Util.init_logging('debug');
-            Util.Debug('dbg');
+            Log.init_logging('debug');
+            Log.Debug('dbg');
             expect(console.debug).to.have.been.calledWith('dbg');
         });
-        
+
         it('should use console.info for Info', function () {
-            Util.init_logging('debug');
-            Util.Info('inf');
+            Log.init_logging('debug');
+            Log.Info('inf');
             expect(console.info).to.have.been.calledWith('inf');
         });
 
         it('should use console.warn for Warn', function () {
-            Util.init_logging('warn');
-            Util.Warn('wrn');
+            Log.init_logging('warn');
+            Log.Warn('wrn');
             expect(console.warn).to.have.been.called;
             expect(console.warn).to.have.been.calledWith('wrn');
         });
 
         it('should use console.error for Error', function () {
-            Util.init_logging('error');
-            Util.Error('err');
+            Log.init_logging('error');
+            Log.Error('err');
             expect(console.error).to.have.been.called;
             expect(console.error).to.have.been.calledWith('err');
         });
     });
 
-    describe('language selection', function () {
-        var origNavigator;
-        beforeEach(function () {
-            // window.navigator is a protected read-only property in many
-            // environments, so we need to redefine it whilst running these
-            // tests.
-            origNavigator = Object.getOwnPropertyDescriptor(window, "navigator");
-            if (origNavigator === undefined) {
-                // Object.getOwnPropertyDescriptor() doesn't work
-                // properly in any version of IE
-                this.skip();
-            }
-
-            Object.defineProperty(window, "navigator", {value: {}});
-            if (window.navigator.languages !== undefined) {
-                // Object.defineProperty() doesn't work properly in old
-                // versions of Chrome
-                this.skip();
-            }
-
-            window.navigator.languages = [];
-        });
-        afterEach(function () {
-            Object.defineProperty(window, "navigator", origNavigator);
+    describe('string functions', function () {
+        it('should decode UTF-8 to DOMString correctly', function () {
+            const utf8string = '\xd0\x9f';
+            const domstring = decodeUTF8(utf8string);
+            expect(domstring).to.equal("П");
         });
 
-        it('should use English by default', function() {
-            expect(Util.Localisation.language).to.equal('en');
+        it('should encode DOMString to UTF-8 correctly', function () {
+            const domstring = "åäöa";
+            const utf8string = encodeUTF8(domstring);
+            expect(utf8string).to.equal('\xc3\xa5\xc3\xa4\xc3\xb6\x61');
         });
-        it('should use English if no user language matches', function() {
-            window.navigator.languages = ["nl", "de"];
-            Util.Localisation.setup(["es", "fr"]);
-            expect(Util.Localisation.language).to.equal('en');
-        });
-        it('should use the most preferred user language', function() {
-            window.navigator.languages = ["nl", "de", "fr"];
-            Util.Localisation.setup(["es", "fr", "de"]);
-            expect(Util.Localisation.language).to.equal('de');
-        });
-        it('should prefer sub-languages languages', function() {
-            window.navigator.languages = ["pt-BR"];
-            Util.Localisation.setup(["pt", "pt-BR"]);
-            expect(Util.Localisation.language).to.equal('pt-BR');
-        });
-        it('should fall back to language "parents"', function() {
-            window.navigator.languages = ["pt-BR"];
-            Util.Localisation.setup(["fr", "pt", "de"]);
-            expect(Util.Localisation.language).to.equal('pt');
-        });
-        it('should not use specific language when user asks for a generic language', function() {
-            window.navigator.languages = ["pt", "de"];
-            Util.Localisation.setup(["fr", "pt-BR", "de"]);
-            expect(Util.Localisation.language).to.equal('de');
-        });
-        it('should handle underscore as a separator', function() {
-            window.navigator.languages = ["pt-BR"];
-            Util.Localisation.setup(["pt_BR"]);
-            expect(Util.Localisation.language).to.equal('pt_BR');
-        });
-        it('should handle difference in case', function() {
-            window.navigator.languages = ["pt-br"];
-            Util.Localisation.setup(["pt-BR"]);
-            expect(Util.Localisation.language).to.equal('pt-BR');
+
+        it('should allow Latin-1 strings if allowLatin1 is set when decoding', function () {
+            const latin1string = '\xe5\xe4\xf6';
+            expect(() => decodeUTF8(latin1string)).to.throw(Error);
+            expect(decodeUTF8(latin1string, true)).to.equal('åäö');
         });
     });
 
     // TODO(directxman12): test the conf_default and conf_defaults methods
-    // TODO(directxman12): test decodeUTF8
     // TODO(directxman12): test the event methods (addEvent, removeEvent, stopEvent)
     // TODO(directxman12): figure out a good way to test getPosition and getEventPosition
     // TODO(directxman12): figure out how to test the browser detection functions properly
     //                     (we can't really test them against the browsers, except for Gecko
     //                     via PhantomJS, the default test driver)
 });
+/* eslint-enable no-console */
