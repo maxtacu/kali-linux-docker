@@ -1,41 +1,70 @@
-const expect = chai.expect;
-
-import Base64 from '../core/base64.js';
-import Display from '../core/display.js';
+// requires local modules: util, base64, display
+// requires test modules: assertions
+/* jshint expr: true */
+var expect = chai.expect;
 
 describe('Display/Canvas Helper', function () {
-    const checked_data = new Uint8Array([
+    var checked_data = [
         0x00, 0x00, 0xff, 255, 0x00, 0x00, 0xff, 255, 0x00, 0xff, 0x00, 255, 0x00, 0xff, 0x00, 255,
         0x00, 0x00, 0xff, 255, 0x00, 0x00, 0xff, 255, 0x00, 0xff, 0x00, 255, 0x00, 0xff, 0x00, 255,
         0x00, 0xff, 0x00, 255, 0x00, 0xff, 0x00, 255, 0x00, 0x00, 0xff, 255, 0x00, 0x00, 0xff, 255,
         0x00, 0xff, 0x00, 255, 0x00, 0xff, 0x00, 255, 0x00, 0x00, 0xff, 255, 0x00, 0x00, 0xff, 255
-    ]);
+    ];
+    checked_data = new Uint8Array(checked_data);
 
-    const basic_data = new Uint8Array([0xff, 0x00, 0x00, 255, 0x00, 0xff, 0x00, 255, 0x00, 0x00, 0xff, 255, 0xff, 0xff, 0xff, 255]);
+    var basic_data = [0xff, 0x00, 0x00, 255, 0x00, 0xff, 0x00, 255, 0x00, 0x00, 0xff, 255, 0xff, 0xff, 0xff, 255];
+    basic_data = new Uint8Array(basic_data);
 
-    function make_image_canvas(input_data) {
-        const canvas = document.createElement('canvas');
+    function make_image_canvas (input_data) {
+        var canvas = document.createElement('canvas');
         canvas.width = 4;
         canvas.height = 4;
-        const ctx = canvas.getContext('2d');
-        const data = ctx.createImageData(4, 4);
-        for (let i = 0; i < checked_data.length; i++) { data.data[i] = input_data[i]; }
+        var ctx = canvas.getContext('2d');
+        var data = ctx.createImageData(4, 4);
+        for (var i = 0; i < checked_data.length; i++) { data.data[i] = input_data[i]; }
         ctx.putImageData(data, 0, 0);
         return canvas;
     }
 
-    function make_image_png(input_data) {
-        const canvas = make_image_canvas(input_data);
-        const url = canvas.toDataURL();
-        const data = url.split(",")[1];
+    function make_image_png (input_data) {
+        var canvas = make_image_canvas(input_data);
+        var url = canvas.toDataURL();
+        var data = url.split(",")[1];
         return Base64.decode(data);
     }
 
-    describe('viewport handling', function () {
-        let display;
+    describe('checking for cursor uri support', function () {
         beforeEach(function () {
-            display = new Display(document.createElement('canvas'));
-            display.clipViewport = true;
+            this._old_browser_supports_cursor_uris = Util.browserSupportsCursorURIs;
+        });
+
+        it('should disable cursor URIs if there is no support', function () {
+            Util.browserSupportsCursorURIs = function () { return false; };
+            var display = new Display({ target: document.createElement('canvas'), prefer_js: true, viewport: false });
+            expect(display._cursor_uri).to.be.false;
+        });
+
+        it('should enable cursor URIs if there is support', function () {
+            Util.browserSupportsCursorURIs = function () { return true; };
+            var display = new Display({ target: document.createElement('canvas'), prefer_js: true, viewport: false });
+            expect(display._cursor_uri).to.be.true;
+        });
+
+        it('respect the cursor_uri option if there is support', function () {
+            Util.browserSupportsCursorURIs = function () { return false; };
+            var display = new Display({ target: document.createElement('canvas'), prefer_js: true, viewport: false, cursor_uri: false });
+            expect(display._cursor_uri).to.be.false;
+        });
+
+        afterEach(function () {
+            Util.browserSupportsCursorURIs = this._old_browser_supports_cursor_uris;
+        });
+    });
+
+    describe('viewport handling', function () {
+        var display;
+        beforeEach(function () {
+            display = new Display({ target: document.createElement('canvas'), prefer_js: false, viewport: true });
             display.resize(5, 5);
             display.viewportChangeSize(3, 3);
             display.viewportChangePos(1, 1);
@@ -47,19 +76,20 @@ describe('Display/Canvas Helper', function () {
             display.drawImage(make_image_canvas(basic_data), 1, 1);
             display.flip();
 
-            const expected = new Uint8Array(16);
-            for (let i = 0; i < 8; i++) { expected[i] = basic_data[i]; }
-            for (let i = 8; i < 16; i++) { expected[i] = 0; }
+            var expected = new Uint8Array(16);
+            var i;
+            for (i = 0; i < 8; i++) { expected[i] = basic_data[i]; }
+            for (i = 8; i < 16; i++) { expected[i] = 0; }
             expect(display).to.have.displayed(expected);
         });
 
-        it('should resize the target canvas when resizing the viewport', function () {
+        it('should resize the target canvas when resizing the viewport', function() {
             display.viewportChangeSize(2, 2);
             expect(display._target.width).to.equal(2);
             expect(display._target.height).to.equal(2);
         });
 
-        it('should move the viewport if necessary', function () {
+        it('should move the viewport if necessary', function() {
             display.viewportChangeSize(5, 5);
             expect(display.absX(0)).to.equal(0);
             expect(display.absY(0)).to.equal(0);
@@ -67,7 +97,7 @@ describe('Display/Canvas Helper', function () {
             expect(display._target.height).to.equal(5);
         });
 
-        it('should limit the viewport to the framebuffer size', function () {
+        it('should limit the viewport to the framebuffer size', function() {
             display.viewportChangeSize(6, 6);
             expect(display._target.width).to.equal(5);
             expect(display._target.height).to.equal(5);
@@ -85,16 +115,27 @@ describe('Display/Canvas Helper', function () {
             expect(display.flip).to.have.been.calledOnce;
         });
 
-        it('should show the entire framebuffer when disabling the viewport', function () {
-            display.clipViewport = false;
+        it('should report clipping when framebuffer > viewport', function () {
+            var clipping = display.clippingDisplay();
+            expect(clipping).to.be.true;
+        });
+
+        it('should report not clipping when framebuffer = viewport', function () {
+            display.viewportChangeSize(5, 5);
+            var clipping = display.clippingDisplay();
+            expect(clipping).to.be.false;
+        });
+
+        it('should show the entire framebuffer when disabling the viewport', function() {
+            display.set_viewport(false);
             expect(display.absX(0)).to.equal(0);
             expect(display.absY(0)).to.equal(0);
             expect(display._target.width).to.equal(5);
             expect(display._target.height).to.equal(5);
         });
 
-        it('should ignore viewport changes when the viewport is disabled', function () {
-            display.clipViewport = false;
+        it('should ignore viewport changes when the viewport is disabled', function() {
+            display.set_viewport(false);
             display.viewportChangeSize(2, 2);
             display.viewportChangePos(1, 1);
             expect(display.absX(0)).to.equal(0);
@@ -103,9 +144,9 @@ describe('Display/Canvas Helper', function () {
             expect(display._target.height).to.equal(5);
         });
 
-        it('should show the entire framebuffer just after enabling the viewport', function () {
-            display.clipViewport = false;
-            display.clipViewport = true;
+        it('should show the entire framebuffer just after enabling the viewport', function() {
+            display.set_viewport(false);
+            display.set_viewport(true);
             expect(display.absX(0)).to.equal(0);
             expect(display.absY(0)).to.equal(0);
             expect(display._target.width).to.equal(5);
@@ -114,10 +155,9 @@ describe('Display/Canvas Helper', function () {
     });
 
     describe('resizing', function () {
-        let display;
+        var display;
         beforeEach(function () {
-            display = new Display(document.createElement('canvas'));
-            display.clipViewport = false;
+            display = new Display({ target: document.createElement('canvas'), prefer_js: false, viewport: false });
             display.resize(4, 4);
         });
 
@@ -131,8 +171,8 @@ describe('Display/Canvas Helper', function () {
             display.fillRect(0, 0, 4, 4, [0, 0, 0xff]);
             display.resize(2, 2);
             display.flip();
-            const expected = [];
-            for (let i = 0; i < 4 * 2*2; i += 4) {
+            var expected = [];
+            for (var i = 0; i < 4 * 2*2; i += 4) {
                 expected[i] = 0xff;
                 expected[i+1] = expected[i+2] = 0;
                 expected[i+3] = 0xff;
@@ -142,7 +182,7 @@ describe('Display/Canvas Helper', function () {
 
         describe('viewport', function () {
             beforeEach(function () {
-                display.clipViewport = true;
+                display.set_viewport(true);
                 display.viewportChangeSize(3, 3);
                 display.viewportChangePos(1, 1);
             });
@@ -174,16 +214,15 @@ describe('Display/Canvas Helper', function () {
     });
 
     describe('rescaling', function () {
-        let display;
-        let canvas;
+        var display;
+        var canvas;
 
         beforeEach(function () {
-            canvas = document.createElement('canvas');
-            display = new Display(canvas);
-            display.clipViewport = true;
+            display = new Display({ target: document.createElement('canvas'), prefer_js: false, viewport: true });
             display.resize(4, 4);
             display.viewportChangeSize(3, 3);
             display.viewportChangePos(1, 1);
+            canvas = display.get_target();
             document.body.appendChild(canvas);
         });
 
@@ -192,21 +231,21 @@ describe('Display/Canvas Helper', function () {
         });
 
         it('should not change the bitmap size of the canvas', function () {
-            display.scale = 2.0;
+            display.set_scale(2.0);
             expect(canvas.width).to.equal(3);
             expect(canvas.height).to.equal(3);
         });
 
         it('should change the effective rendered size of the canvas', function () {
-            display.scale = 2.0;
+            display.set_scale(2.0);
             expect(canvas.clientWidth).to.equal(6);
             expect(canvas.clientHeight).to.equal(6);
         });
 
         it('should not change when resizing', function () {
-            display.scale = 2.0;
+            display.set_scale(2.0);
             display.resize(5, 5);
-            expect(display.scale).to.equal(2.0);
+            expect(display.get_scale()).to.equal(2.0);
             expect(canvas.width).to.equal(3);
             expect(canvas.height).to.equal(3);
             expect(canvas.clientWidth).to.equal(6);
@@ -215,15 +254,13 @@ describe('Display/Canvas Helper', function () {
     });
 
     describe('autoscaling', function () {
-        let display;
-        let canvas;
+        var display;
+        var canvas;
 
         beforeEach(function () {
-            canvas = document.createElement('canvas');
-            display = new Display(canvas);
-            display.clipViewport = true;
+            display = new Display({ target: document.createElement('canvas'), prefer_js: false, viewport: true });
             display.resize(4, 3);
-            display.viewportChangeSize(4, 3);
+            canvas = display.get_target();
             document.body.appendChild(canvas);
         });
 
@@ -258,129 +295,163 @@ describe('Display/Canvas Helper', function () {
             expect(canvas.width).to.equal(4);
             expect(canvas.height).to.equal(3);
         });
+
+        it('should not upscale when downscaleOnly is true', function () {
+            display.autoscale(2, 2, true);
+            expect(display.absX(9)).to.equal(18);
+            expect(display.absY(18)).to.equal(36);
+            expect(canvas.clientWidth).to.equal(2);
+            expect(canvas.clientHeight).to.equal(2);
+
+            display.autoscale(16, 9, true);
+            expect(display.absX(9)).to.equal(9);
+            expect(display.absY(18)).to.equal(18);
+            expect(canvas.clientWidth).to.equal(4);
+            expect(canvas.clientHeight).to.equal(3);
+        });
     });
 
     describe('drawing', function () {
 
         // TODO(directxman12): improve the tests for each of the drawing functions to cover more than just the
         //                     basic cases
-        let display;
-        beforeEach(function () {
-            display = new Display(document.createElement('canvas'));
-            display.resize(4, 4);
-        });
+        function drawing_tests (pref_js) {
+            var display;
+            beforeEach(function () {
+                display = new Display({ target: document.createElement('canvas'), prefer_js: pref_js });
+                display.resize(4, 4);
+            });
 
-        it('should not draw directly on the target canvas', function () {
-            display.fillRect(0, 0, 4, 4, [0, 0, 0xff]);
-            display.flip();
-            display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
-            const expected = [];
-            for (let i = 0; i < 4 * display._fb_width * display._fb_height; i += 4) {
-                expected[i] = 0xff;
-                expected[i+1] = expected[i+2] = 0;
-                expected[i+3] = 0xff;
-            }
-            expect(display).to.have.displayed(new Uint8Array(expected));
-        });
+            it('should clear the screen on #clear without a logo set', function () {
+                display.fillRect(0, 0, 4, 4, [0x00, 0x00, 0xff]);
+                display._logo = null;
+                display.clear();
+                display.resize(4, 4);
+                var empty = [];
+                for (var i = 0; i < 4 * display._fb_width * display._fb_height; i++) { empty[i] = 0; }
+                expect(display).to.have.displayed(new Uint8Array(empty));
+            });
 
-        it('should support filling a rectangle with particular color via #fillRect', function () {
-            display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
-            display.fillRect(0, 0, 2, 2, [0xff, 0, 0]);
-            display.fillRect(2, 2, 2, 2, [0xff, 0, 0]);
-            display.flip();
-            expect(display).to.have.displayed(checked_data);
-        });
+            it('should draw the logo on #clear with a logo set', function (done) {
+                display._logo = { width: 4, height: 4, type: "image/png", data: make_image_png(checked_data) };
+                display.clear();
+                display.set_onFlush(function () {
+                    expect(display).to.have.displayed(checked_data);
+                    expect(display._fb_width).to.equal(4);
+                    expect(display._fb_height).to.equal(4);
+                    done();
+                });
+                display.flush();
+            });
 
-        it('should support copying an portion of the canvas via #copyImage', function () {
-            display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
-            display.fillRect(0, 0, 2, 2, [0xff, 0, 0x00]);
-            display.copyImage(0, 0, 2, 2, 2, 2);
-            display.flip();
-            expect(display).to.have.displayed(checked_data);
-        });
-
-        it('should support drawing images via #imageRect', function (done) {
-            display.imageRect(0, 0, 4, 4, "image/png", make_image_png(checked_data));
-            display.flip();
-            display.onflush = () => {
-                expect(display).to.have.displayed(checked_data);
-                done();
-            };
-            display.flush();
-        });
-
-        it('should support drawing tile data with a background color and sub tiles', function () {
-            display.startTile(0, 0, 4, 4, [0, 0xff, 0]);
-            display.subTile(0, 0, 2, 2, [0xff, 0, 0]);
-            display.subTile(2, 2, 2, 2, [0xff, 0, 0]);
-            display.finishTile();
-            display.flip();
-            expect(display).to.have.displayed(checked_data);
-        });
-
-        // We have a special cache for 16x16 tiles that we need to test
-        it('should support drawing a 16x16 tile', function () {
-            const large_checked_data = new Uint8Array(16*16*4);
-            display.resize(16, 16);
-
-            for (let y = 0;y < 16;y++) {
-                for (let x = 0;x < 16;x++) {
-                    let pixel;
-                    if ((x < 4) && (y < 4)) {
-                        // NB: of course IE11 doesn't support #slice on ArrayBufferViews...
-                        pixel = Array.prototype.slice.call(checked_data, (y*4+x)*4, (y*4+x+1)*4);
-                    } else {
-                        pixel = [0, 0xff, 0, 255];
-                    }
-                    large_checked_data.set(pixel, (y*16+x)*4);
+            it('should not draw directly on the target canvas', function () {
+                display.fillRect(0, 0, 4, 4, [0, 0, 0xff]);
+                display.flip();
+                display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
+                var expected = [];
+                for (var i = 0; i < 4 * display._fb_width * display._fb_height; i += 4) {
+                    expected[i] = 0xff;
+                    expected[i+1] = expected[i+2] = 0;
+                    expected[i+3] = 0xff;
                 }
-            }
+                expect(display).to.have.displayed(new Uint8Array(expected));
+            });
 
-            display.startTile(0, 0, 16, 16, [0, 0xff, 0]);
-            display.subTile(0, 0, 2, 2, [0xff, 0, 0]);
-            display.subTile(2, 2, 2, 2, [0xff, 0, 0]);
-            display.finishTile();
-            display.flip();
-            expect(display).to.have.displayed(large_checked_data);
-        });
+            it('should support filling a rectangle with particular color via #fillRect', function () {
+                display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
+                display.fillRect(0, 0, 2, 2, [0xff, 0, 0]);
+                display.fillRect(2, 2, 2, 2, [0xff, 0, 0]);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
 
-        it('should support drawing BGRX blit images with true color via #blitImage', function () {
-            const data = [];
-            for (let i = 0; i < 16; i++) {
-                data[i * 4] = checked_data[i * 4 + 2];
-                data[i * 4 + 1] = checked_data[i * 4 + 1];
-                data[i * 4 + 2] = checked_data[i * 4];
-                data[i * 4 + 3] = checked_data[i * 4 + 3];
-            }
-            display.blitImage(0, 0, 4, 4, data, 0);
-            display.flip();
-            expect(display).to.have.displayed(checked_data);
-        });
+            it('should support copying an portion of the canvas via #copyImage', function () {
+                display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
+                display.fillRect(0, 0, 2, 2, [0xff, 0, 0x00]);
+                display.copyImage(0, 0, 2, 2, 2, 2);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
 
-        it('should support drawing RGB blit images with true color via #blitRgbImage', function () {
-            const data = [];
-            for (let i = 0; i < 16; i++) {
-                data[i * 3] = checked_data[i * 4];
-                data[i * 3 + 1] = checked_data[i * 4 + 1];
-                data[i * 3 + 2] = checked_data[i * 4 + 2];
-            }
-            display.blitRgbImage(0, 0, 4, 4, data, 0);
-            display.flip();
-            expect(display).to.have.displayed(checked_data);
-        });
+            it('should support drawing images via #imageRect', function (done) {
+                display.imageRect(0, 0, "image/png", make_image_png(checked_data));
+                display.flip();
+                display.set_onFlush(function () {
+                    expect(display).to.have.displayed(checked_data);
+                    done();
+                });
+                display.flush();
+            });
 
-        it('should support drawing an image object via #drawImage', function () {
-            const img = make_image_canvas(checked_data);
-            display.drawImage(img, 0, 0);
-            display.flip();
-            expect(display).to.have.displayed(checked_data);
-        });
+            it('should support drawing tile data with a background color and sub tiles', function () {
+                display.startTile(0, 0, 4, 4, [0, 0xff, 0]);
+                display.subTile(0, 0, 2, 2, [0xff, 0, 0]);
+                display.subTile(2, 2, 2, 2, [0xff, 0, 0]);
+                display.finishTile();
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
+
+            it('should support drawing BGRX blit images with true color via #blitImage', function () {
+                var data = [];
+                for (var i = 0; i < 16; i++) {
+                    data[i * 4] = checked_data[i * 4 + 2];
+                    data[i * 4 + 1] = checked_data[i * 4 + 1];
+                    data[i * 4 + 2] = checked_data[i * 4];
+                    data[i * 4 + 3] = checked_data[i * 4 + 3];
+                }
+                display.blitImage(0, 0, 4, 4, data, 0);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
+
+            it('should support drawing RGB blit images with true color via #blitRgbImage', function () {
+                var data = [];
+                for (var i = 0; i < 16; i++) {
+                    data[i * 3] = checked_data[i * 4];
+                    data[i * 3 + 1] = checked_data[i * 4 + 1];
+                    data[i * 3 + 2] = checked_data[i * 4 + 2];
+                }
+                display.blitRgbImage(0, 0, 4, 4, data, 0);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
+
+            it('should support drawing solid colors with color maps', function () {
+                display._true_color = false;
+                display.set_colourMap({ 0: [0xff, 0, 0], 1: [0, 0xff, 0] });
+                display.fillRect(0, 0, 4, 4, 1);
+                display.fillRect(0, 0, 2, 2, 0);
+                display.fillRect(2, 2, 2, 2, 0);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
+
+            it('should support drawing blit images with color maps', function () {
+                display._true_color = false;
+                display.set_colourMap({ 1: [0xff, 0, 0], 0: [0, 0xff, 0] });
+                var data = [1, 1, 0, 0, 1, 1, 0, 0, 0, 0, 1, 1, 0, 0, 1, 1].map(function (elem) { return [elem]; });
+                display.blitImage(0, 0, 4, 4, data, 0);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
+
+            it('should support drawing an image object via #drawImage', function () {
+                var img = make_image_canvas(checked_data);
+                display.drawImage(img, 0, 0);
+                display.flip();
+                expect(display).to.have.displayed(checked_data);
+            });
+        }
+
+        describe('(prefering native methods)', function () { drawing_tests.call(this, false); });
+        describe('(prefering JavaScript)', function () { drawing_tests.call(this, true); });
     });
 
     describe('the render queue processor', function () {
-        let display;
+        var display;
         beforeEach(function () {
-            display = new Display(document.createElement('canvas'));
+            display = new Display({ target: document.createElement('canvas'), prefer_js: false });
             display.resize(4, 4);
             sinon.spy(display, '_scan_renderQ');
         });
@@ -401,8 +472,8 @@ describe('Display/Canvas Helper', function () {
         });
 
         it('should wait until an image is loaded to attempt to draw it and the rest of the queue', function () {
-            const img = { complete: false, width: 4, height: 4, addEventListener: sinon.spy() };
-            display._renderQ = [{ type: 'img', x: 3, y: 4, width: 4, height: 4, img: img },
+            var img = { complete: false, addEventListener: sinon.spy() }
+            display._renderQ = [{ type: 'img', x: 3, y: 4, img: img },
                                 { type: 'fill', x: 1, y: 2, width: 3, height: 4, color: 5 }];
             display.drawImage = sinon.spy();
             display.fillRect = sinon.spy();
@@ -413,27 +484,6 @@ describe('Display/Canvas Helper', function () {
             expect(img.addEventListener).to.have.been.calledOnce;
 
             display._renderQ[0].img.complete = true;
-            display._scan_renderQ();
-            expect(display.drawImage).to.have.been.calledOnce;
-            expect(display.fillRect).to.have.been.calledOnce;
-            expect(img.addEventListener).to.have.been.calledOnce;
-        });
-
-        it('should wait if an image is incorrectly loaded', function () {
-            const img = { complete: true, width: 0, height: 0, addEventListener: sinon.spy() };
-            display._renderQ = [{ type: 'img', x: 3, y: 4, width: 4, height: 4, img: img },
-                                { type: 'fill', x: 1, y: 2, width: 3, height: 4, color: 5 }];
-            display.drawImage = sinon.spy();
-            display.fillRect = sinon.spy();
-
-            display._scan_renderQ();
-            expect(display.drawImage).to.not.have.been.called;
-            expect(display.fillRect).to.not.have.been.called;
-            expect(img.addEventListener).to.have.been.calledOnce;
-
-            display._renderQ[0].img.complete = true;
-            display._renderQ[0].img.width = 4;
-            display._renderQ[0].img.height = 4;
             display._scan_renderQ();
             expect(display.drawImage).to.have.been.calledOnce;
             expect(display.fillRect).to.have.been.calledOnce;
@@ -441,11 +491,11 @@ describe('Display/Canvas Helper', function () {
         });
 
         it('should call callback when queue is flushed', function () {
-            display.onflush = sinon.spy();
+            display.set_onFlush(sinon.spy());
             display.fillRect(0, 0, 4, 4, [0, 0xff, 0]);
-            expect(display.onflush).to.not.have.been.called;
+            expect(display.get_onFlush()).to.not.have.been.called;
             display.flush();
-            expect(display.onflush).to.have.been.calledOnce;
+            expect(display.get_onFlush()).to.have.been.calledOnce;
         });
 
         it('should draw a blit image on type "blit"', function () {

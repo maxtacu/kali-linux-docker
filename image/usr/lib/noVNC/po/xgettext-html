@@ -1,20 +1,21 @@
 #!/usr/bin/env node
 /*
  * xgettext-html: HTML gettext parser
- * Copyright (C) 2018 The noVNC Authors
+ * Copyright (C) 2016 Pierre Ossman
  * Licensed under MPL 2.0 (see LICENSE.txt)
  */
 
-const getopt = require('node-getopt');
-const jsdom = require("jsdom");
-const fs = require("fs");
+var getopt = require('node-getopt');
 
-const opt = getopt.create([
-    ['o', 'output=FILE', 'write output to specified file'],
-    ['h', 'help', 'display this help'],
+var jsdom = require("jsdom");
+var fs = require("fs");
+
+opt = getopt.create([
+    ['o' , 'output=FILE'      , 'write output to specified file'],
+    ['h' , 'help'             , 'display this help'],
 ]).bindHelp().parseSystem();
 
-const strings = {};
+var strings = {};
 
 function addString(str, location) {
     if (str.length == 0) {
@@ -22,7 +23,7 @@ function addString(str, location) {
     }
 
     if (strings[str] === undefined) {
-        strings[str] = {};
+        strings[str] = {}
     }
     strings[str][location] = null;
 }
@@ -68,13 +69,13 @@ function process(elem, locator, enabled) {
         }
         if (elem.hasAttribute("value") &&
             elem.tagName === "INPUT" &&
-            isAnyOf(elem.getAttribute("type"), ["reset", "button", "submit"])) {
+            isAnyOf(elem.getAttribute("type"), ["reset", "button"])) {
             addString(elem.getAttribute("value"), locator(elem));
         }
     }
 
-    for (let i = 0; i < elem.childNodes.length; i++) {
-        let node = elem.childNodes[i];
+    for (var i = 0;i < elem.childNodes.length;i++) {
+        node = elem.childNodes[i];
         if (node.nodeType === node.ELEMENT_NODE) {
             process(node, locator, enabled);
         } else if (node.nodeType === node.TEXT_NODE && enabled) {
@@ -83,24 +84,25 @@ function process(elem, locator, enabled) {
     }
 }
 
-for (let i = 0; i < opt.argv.length; i++) {
-    const fn = opt.argv[i];
-    const file = fs.readFileSync(fn, "utf8");
-    const dom = new jsdom.JSDOM(file, { includeNodeLocations: true });
-    const body = dom.window.document.body;
+for (var i = 0;i < opt.argv.length;i++) {
+    var file;
 
-    let locator = (elem) => {
-        const offset = dom.nodeLocation(elem).startOffset;
-        const line = file.slice(0, offset).split("\n").length;
+    fn = opt.argv[i];
+    file = fs.readFileSync(fn, "utf8");
+    doc = jsdom.jsdom(file);
+
+    locator = function (elem) {
+        offset = jsdom.nodeLocation(elem).start;
+        line = file.slice(0, offset).split("\n").length;
         return fn + ":" + line;
     };
 
-    process(body, locator, true);
+    process(doc.body, locator, true);
 }
 
-let output = "";
+var output = "";
 
-for (let str in strings) {
+for (str in strings) {
     output += "#:";
     for (location in strings[str]) {
         output += " " + location;

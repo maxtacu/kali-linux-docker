@@ -1,316 +1,293 @@
 # Swedish translations for noVNC package
 # Svenska översättningar för paket noVNC.
-# Copyright (C) 2018 The noVNC Authors
+# Copyright (C) 2016 Various Authors
 # This file is distributed under the same license as the noVNC package.
-# Samuel Mannehed <samuel@cendio.se>, 2019.
+# Samuel Mannehed <samuel@cendio.se>, 2016.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: noVNC 1.1.0\n"
+"Project-Id-Version: noVNC 0.6.1\n"
 "Report-Msgid-Bugs-To: novnc@googlegroups.com\n"
-"POT-Creation-Date: 2019-01-16 11:06+0100\n"
-"PO-Revision-Date: 2019-04-08 10:18+0200\n"
-"Last-Translator: Samuel Mannehed <samuel@cendio.se>\n"
+"POT-Creation-Date: 2016-11-15 19:32+0100\n"
+"PO-Revision-Date: 2016-11-15 07:51+0100\n"
+"Last-Translator: Pierre Ossman <pierre@ossman.eu>\n"
 "Language-Team: none\n"
 "Language: sv\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
-"X-Generator: Poedit 2.0.3\n"
 
-#: ../app/ui.js:387
+#: ../app/ui.js:405
 msgid "Connecting..."
 msgstr "Ansluter..."
 
-#: ../app/ui.js:394
-msgid "Disconnecting..."
-msgstr "Kopplar ner..."
-
-#: ../app/ui.js:400
-msgid "Reconnecting..."
-msgstr "Återansluter..."
-
-#: ../app/ui.js:405
-msgid "Internal error"
-msgstr "Internt fel"
-
-#: ../app/ui.js:995
-msgid "Must set host"
-msgstr "Du måste specifiera en värd"
-
-#: ../app/ui.js:1077
+#: ../app/ui.js:412
 msgid "Connected (encrypted) to "
 msgstr "Ansluten (krypterat) till "
 
-#: ../app/ui.js:1079
+#: ../app/ui.js:414
 msgid "Connected (unencrypted) to "
 msgstr "Ansluten (okrypterat) till "
 
-#: ../app/ui.js:1102
-msgid "Something went wrong, connection is closed"
-msgstr "Något gick fel, anslutningen avslutades"
+#: ../app/ui.js:419
+msgid "Disconnecting..."
+msgstr "Kopplar ner..."
 
-#: ../app/ui.js:1105
-msgid "Failed to connect to server"
-msgstr "Misslyckades att ansluta till servern"
-
-#: ../app/ui.js:1115
+#: ../app/ui.js:424
 msgid "Disconnected"
 msgstr "Frånkopplad"
 
-#: ../app/ui.js:1128
-msgid "New connection has been rejected with reason: "
-msgstr "Ny anslutning har blivit nekad med följande skäl: "
+#: ../app/ui.js:1009 ../core/rfb.js:278
+msgid "Must set host and port"
+msgstr "Du måste specifiera en host och port"
 
-#: ../app/ui.js:1131
-msgid "New connection has been rejected"
-msgstr "Ny anslutning har blivit nekad"
-
-#: ../app/ui.js:1151
+#: ../app/ui.js:1062
 msgid "Password is required"
 msgstr "Lösenord krävs"
 
-#: ../vnc.html:84
+#: ../app/ui.js:1275
+msgid ""
+"Forcing clipping mode since scrollbars aren't supported by IE in fullscreen"
+msgstr ""
+"Tvingar 'Clipping mode' eftersom skrollning inte stödjs av IE i fullskärm"
+
+#: ../core/rfb.js:556
+msgid "Disconnect timeout"
+msgstr "Det tog för lång tid att koppla ner"
+
+#: ../vnc.html:70
 msgid "noVNC encountered an error:"
 msgstr "noVNC stötte på ett problem:"
 
-#: ../vnc.html:94
+#: ../vnc.html:78
 msgid "Hide/Show the control bar"
 msgstr "Göm/Visa kontrollbaren"
 
-#: ../vnc.html:101
+#: ../vnc.html:85
 msgid "Move/Drag Viewport"
 msgstr "Flytta/Dra Vyn"
 
-#: ../vnc.html:101
+#: ../vnc.html:85
 msgid "viewport drag"
 msgstr "dra vy"
 
-#: ../vnc.html:107 ../vnc.html:110 ../vnc.html:113 ../vnc.html:116
+#: ../vnc.html:91 ../vnc.html:94 ../vnc.html:97 ../vnc.html:100
 msgid "Active Mouse Button"
 msgstr "Aktiv musknapp"
 
-#: ../vnc.html:107
+#: ../vnc.html:91
 msgid "No mousebutton"
 msgstr "Ingen musknapp"
 
-#: ../vnc.html:110
+#: ../vnc.html:94
 msgid "Left mousebutton"
 msgstr "Vänster musknapp"
 
-#: ../vnc.html:113
+#: ../vnc.html:97
 msgid "Middle mousebutton"
 msgstr "Mitten-musknapp"
 
-#: ../vnc.html:116
+#: ../vnc.html:100
 msgid "Right mousebutton"
 msgstr "Höger musknapp"
 
-#: ../vnc.html:119
+#: ../vnc.html:103
 msgid "Keyboard"
 msgstr "Tangentbord"
 
-#: ../vnc.html:119
+#: ../vnc.html:103
 msgid "Show Keyboard"
 msgstr "Visa Tangentbord"
 
-#: ../vnc.html:126
+#: ../vnc.html:110
 msgid "Extra keys"
 msgstr "Extraknappar"
 
-#: ../vnc.html:126
+#: ../vnc.html:110
 msgid "Show Extra Keys"
 msgstr "Visa Extraknappar"
 
-#: ../vnc.html:131
+#: ../vnc.html:115
 msgid "Ctrl"
 msgstr "Ctrl"
 
-#: ../vnc.html:131
+#: ../vnc.html:115
 msgid "Toggle Ctrl"
 msgstr "Växla Ctrl"
 
-#: ../vnc.html:134
+#: ../vnc.html:118
 msgid "Alt"
 msgstr "Alt"
 
-#: ../vnc.html:134
+#: ../vnc.html:118
 msgid "Toggle Alt"
 msgstr "Växla Alt"
 
-#: ../vnc.html:137
-msgid "Toggle Windows"
-msgstr "Växla Windows"
-
-#: ../vnc.html:137
-msgid "Windows"
-msgstr "Windows"
-
-#: ../vnc.html:140
+#: ../vnc.html:121
 msgid "Send Tab"
 msgstr "Skicka Tab"
 
-#: ../vnc.html:140
+#: ../vnc.html:121
 msgid "Tab"
 msgstr "Tab"
 
-#: ../vnc.html:143
+#: ../vnc.html:124
 msgid "Esc"
 msgstr "Esc"
 
-#: ../vnc.html:143
+#: ../vnc.html:124
 msgid "Send Escape"
 msgstr "Skicka Escape"
 
-#: ../vnc.html:146
+#: ../vnc.html:127
 msgid "Ctrl+Alt+Del"
 msgstr "Ctrl+Alt+Del"
 
-#: ../vnc.html:146
+#: ../vnc.html:127
 msgid "Send Ctrl-Alt-Del"
 msgstr "Skicka Ctrl-Alt-Del"
 
-#: ../vnc.html:154
+#: ../vnc.html:135
 msgid "Shutdown/Reboot"
 msgstr "Stäng av/Boota om"
 
-#: ../vnc.html:154
+#: ../vnc.html:135
 msgid "Shutdown/Reboot..."
 msgstr "Stäng av/Boota om..."
 
-#: ../vnc.html:160
+#: ../vnc.html:141
 msgid "Power"
 msgstr "Ström"
 
-#: ../vnc.html:162
+#: ../vnc.html:143
 msgid "Shutdown"
 msgstr "Stäng av"
 
-#: ../vnc.html:163
+#: ../vnc.html:144
 msgid "Reboot"
 msgstr "Boota om"
 
-#: ../vnc.html:164
+#: ../vnc.html:145
 msgid "Reset"
 msgstr "Återställ"
 
-#: ../vnc.html:169 ../vnc.html:175
+#: ../vnc.html:150 ../vnc.html:156
 msgid "Clipboard"
 msgstr "Urklipp"
 
-#: ../vnc.html:179
+#: ../vnc.html:160
 msgid "Clear"
 msgstr "Rensa"
 
-#: ../vnc.html:185
+#: ../vnc.html:166
 msgid "Fullscreen"
 msgstr "Fullskärm"
 
-#: ../vnc.html:190 ../vnc.html:197
+#: ../vnc.html:171 ../vnc.html:178
 msgid "Settings"
 msgstr "Inställningar"
 
-#: ../vnc.html:200
-msgid "Shared Mode"
-msgstr "Delat Läge"
-
-#: ../vnc.html:203
-msgid "View Only"
-msgstr "Endast Visning"
-
-#: ../vnc.html:207
-msgid "Clip to Window"
-msgstr "Begränsa till Fönster"
-
-#: ../vnc.html:210
-msgid "Scaling Mode:"
-msgstr "Skalningsläge:"
-
-#: ../vnc.html:212
-msgid "None"
-msgstr "Ingen"
-
-#: ../vnc.html:213
-msgid "Local Scaling"
-msgstr "Lokal Skalning"
-
-#: ../vnc.html:214
-msgid "Remote Resizing"
-msgstr "Ändra Storlek"
-
-#: ../vnc.html:219
-msgid "Advanced"
-msgstr "Avancerat"
-
-#: ../vnc.html:222
-msgid "Repeater ID:"
-msgstr "Repeater-ID:"
-
-#: ../vnc.html:226
-msgid "WebSocket"
-msgstr "WebSocket"
-
-#: ../vnc.html:229
+#: ../vnc.html:181
 msgid "Encrypt"
 msgstr "Kryptera"
 
-#: ../vnc.html:232
-msgid "Host:"
-msgstr "Värd:"
+#: ../vnc.html:184
+msgid "True Color"
+msgstr "Fullfärg"
 
-#: ../vnc.html:236
-msgid "Port:"
-msgstr "Port:"
+#: ../vnc.html:187
+msgid "Local Cursor"
+msgstr "Lokal Muspekare"
 
-#: ../vnc.html:240
+#: ../vnc.html:190
+msgid "Clip to Window"
+msgstr "Begränsa till Fönster"
+
+#: ../vnc.html:193
+msgid "Shared Mode"
+msgstr "Delat Läge"
+
+#: ../vnc.html:196
+msgid "View Only"
+msgstr "Endast Visning"
+
+#: ../vnc.html:200
 msgid "Path:"
 msgstr "Sökväg:"
 
-#: ../vnc.html:247
-msgid "Automatic Reconnect"
-msgstr "Automatisk Återanslutning"
+#: ../vnc.html:204
+msgid "Scaling Mode:"
+msgstr "Skalningsläge:"
 
-#: ../vnc.html:250
-msgid "Reconnect Delay (ms):"
-msgstr "Fördröjning (ms):"
+#: ../vnc.html:206
+msgid "None"
+msgstr "Ingen"
 
-#: ../vnc.html:255
-msgid "Show Dot when No Cursor"
-msgstr "Visa prick när ingen muspekare finns"
+#: ../vnc.html:207
+msgid "Local Scaling"
+msgstr "Lokal Skalning"
 
-#: ../vnc.html:260
+#: ../vnc.html:208
+msgid "Local Downscaling"
+msgstr "Lokal Nedskalning"
+
+#: ../vnc.html:209
+msgid "Remote Resizing"
+msgstr "Ändra Storlek"
+
+#: ../vnc.html:213
+msgid "Repeater ID:"
+msgstr "Repeater-ID:"
+
+#: ../vnc.html:219
+msgid "Style:"
+msgstr "Stil:"
+
+#: ../vnc.html:221
+msgid "default"
+msgstr "standard"
+
+#: ../vnc.html:227
 msgid "Logging:"
 msgstr "Loggning:"
 
-#: ../vnc.html:272
-msgid "Disconnect"
-msgstr "Koppla från"
+#: ../vnc.html:234
+msgid "Apply"
+msgstr "Verkställ"
 
-#: ../vnc.html:291
+#: ../vnc.html:241 ../vnc.html:271
 msgid "Connect"
 msgstr "Anslut"
 
-#: ../vnc.html:301
+#: ../vnc.html:244
+msgid "Disconnect"
+msgstr "Koppla från"
+
+#: ../vnc.html:251
+msgid "Connection"
+msgstr "Uppkoppling"
+
+#: ../vnc.html:254
+msgid "Host:"
+msgstr "Värd:"
+
+#: ../vnc.html:258
+msgid "Port:"
+msgstr "Port:"
+
+#: ../vnc.html:262 ../vnc.html:290
 msgid "Password:"
 msgstr "Lösenord:"
 
-#: ../vnc.html:305
+#: ../vnc.html:266
+msgid "Token:"
+msgstr "Token:"
+
+#: ../vnc.html:294
 msgid "Send Password"
-msgstr "Skicka lösenord"
+msgstr "Skicka Lösenord"
 
-#: ../vnc.html:315
-msgid "Cancel"
-msgstr "Avbryt"
-
-#~ msgid "Disconnect timeout"
-#~ msgstr "Det tog för lång tid att koppla ner"
-
-#~ msgid "Local Downscaling"
-#~ msgstr "Lokal Nedskalning"
-
-#~ msgid "Local Cursor"
-#~ msgstr "Lokal Muspekare"
-
-#~ msgid "Canvas not supported."
-#~ msgstr "Canvas stöds ej"
+#: ../vnc.html:319
+msgid "Canvas not supported."
+msgstr "Canvas stöds ej"
