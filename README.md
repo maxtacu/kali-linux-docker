@@ -19,7 +19,7 @@ docker build -t kali-docker .
 Run the docker image and open port `6080`
 
 ```
-docker run -it -d --rm -p 6080:80 kali-docker
+docker run -it -d --rm --name kali-docker -p 6080:80 kali-docker
 ```
 
 Browse http://127.0.0.1:6080/

@@ -14,13 +14,13 @@ RUN apt-get install -y --no-install-recommends --allow-unauthenticated \
         lxde x11vnc xvfb autocutsel \
 	    xfonts-base lwm xterm \
         nginx \
-        python-pip python-dev build-essential \
+        python3-pip python3-dev build-essential \
         mesa-utils libgl1-mesa-dri \
         dbus-x11 x11-utils \
     && apt-get -y autoclean \
     && apt-get -y autoremove \
     && rm -rf /var/lib/apt/lists/* \
-    && pip install -U pip
+    && pip3 install -U pip
 
 # For installing other Kali metapackages check https://tools.kali.org/kali-metapackages
 # RUN apt-get update && apt-cache search kali-linux && apt-get install -y   \
@@ -31,7 +31,7 @@ ADD https://github.com/krallin/tini/releases/download/${TINI_VERSION}/tini /bin/
 RUN chmod +x /bin/tini
 
 ADD image /
-RUN pip install setuptools wheel && pip install -r /usr/lib/web/requirements.txt
+RUN pip3 install setuptools wheel && pip install -r /usr/lib/web/requirements.txt
 
 EXPOSE 80
 WORKDIR /root
