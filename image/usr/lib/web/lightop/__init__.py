@@ -27,9 +27,6 @@ import subprocess
 import time
 
 
-FIRST = True
-
-
 def exception_to_json(func):
     @wraps(func)
     def wrapper(*args, **kwargs):
@@ -92,11 +89,7 @@ def index():
 
 @app.route('/redirect.html')
 def redirectme():
-    global FIRST
-
-    if not FIRST:
-        return HTML_REDIRECT
-
+    
     env = {'width': 1024, 'height': 768}
     if 'width' in request.args:
         env['width'] = request.args['width']
@@ -104,18 +97,20 @@ def redirectme():
         env['height'] = request.args['height']
 
     # sed
-    subprocess.check_call(r"sed -i 's#^command=/usr/bin/Xvfb.*$#command=/usr/bin/Xvfb :1 -screen 0 {width}x{height}x16#' /etc/supervisor/conf.d/supervisord.conf".format(**env),
-                          shell=True)
+    subprocess.check_call(r"sed -i 's#^command=/usr/bin/Xvfb.*$#command=/usr/bin/Xvfb :1 -screen 0 {width}x{height}x16#' /etc/supervisor/conf.d/supervisord.conf".format(**env), shell=True)
     # supervisorctrl reload
     subprocess.check_call(r"supervisorctl reload", shell=True)
 
     # check all running
-    for i in xrange(20):
+    for i in range(3):
         output = subprocess.check_output(r"supervisorctl status | grep RUNNING | wc -l", shell=True)
-        if output.strip() == "6":
-            FIRST = False
+        if output.decode("utf-8").strip() == "6":
             return HTML_REDIRECT
-        time.sleep(2)
+        else:
+            # supervisorctrl reload
+            subprocess.check_call(r"supervisorctl reload", shell=True)
+        time.sleep(3)
+
     abort(500, 'service is not ready, please restart container')
 
 

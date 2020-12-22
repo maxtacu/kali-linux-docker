@@ -1,121 +1,138 @@
 #!/usr/bin/env node
 
-var path = require('path');
-var program = require('commander');
-var fs = require('fs');
-var fse = require('fs-extra');
-var browserify = require('browserify');
-
-var make_modules_transform = require('./make-module-transform');
-var babelify = require("babelify");
-
+const path = require('path');
+const program = require('commander');
+const fs = require('fs');
+const fse = require('fs-extra');
+const babel = require('@babel/core');
 
 program
-    .option('-b, --browserify', 'create a browserify bundled app')
-    .option('--as-require', 'output files using "require" instead of ES6 import and export')
+    .option('-m, --with-source-maps [type]', 'output source maps when not generating a bundled app (type may be empty for external source maps, inline for inline source maps, or both) ')
+    .option('--clean', 'clear the lib folder before building')
     .parse(process.argv);
 
 // the various important paths
-var core_path = path.resolve(__dirname, '..', 'core');
-var app_path = path.resolve(__dirname, '..', 'app');
-var out_dir_base = path.resolve(__dirname, '..', 'build');
-var lib_dir_base = path.resolve(__dirname, '..', 'lib');
-
-var make_browserify = function (src_files, opts) {
-    // change to the root noVNC directory
-    process.chdir(path.resolve(__dirname, '..'));
-
-    var b = browserify(src_files, opts);
-
-    // register the transforms
-    b.transform(make_modules_transform);
-    b.transform(babelify,
-                { plugins: ["add-module-exports", "transform-es2015-modules-commonjs"] });
-
-    return b;
+const paths = {
+    main: path.resolve(__dirname, '..'),
+    core: path.resolve(__dirname, '..', 'core'),
+    vendor: path.resolve(__dirname, '..', 'vendor'),
+    libDirBase: path.resolve(__dirname, '..', 'lib'),
 };
 
-var make_full_app = function () {
-    // make sure the output directory exists
-    fse.ensureDir(out_dir_base);
-
-    // actually bundle the files into a browserified bundled
-    var ui_file = path.join(app_path, 'ui.js');
-    var b = make_browserify(ui_file, {});
-    var app_file = path.join(out_dir_base, 'app.js');
-    b.bundle().pipe(fs.createWriteStream(app_file));
-
-    // copy over app-related resources (images, styles, etc)
-    var src_dir_app = path.join(__dirname, '..', 'app');
-    fs.readdir(src_dir_app, function (err, files) {
-        if (err) { throw err; }
-
-        files.forEach(function (src_file) {
-            var src_file_path = path.resolve(src_dir_app, src_file);
-            var out_file_path = path.resolve(out_dir_base, src_file);
-            var ext = path.extname(src_file);
-            if (ext === '.js' || ext === '.html') return;
-            fse.copy(src_file_path, out_file_path, function (err) {
-                if (err) { throw err; }
-                console.log("Copied file(s) from " + src_file_path + " to " + out_file_path);
-            });
+// util.promisify requires Node.js 8.x, so we have our own
+function promisify(original) {
+    return function promiseWrap() {
+        const args = Array.prototype.slice.call(arguments);
+        return new Promise((resolve, reject) => {
+            original.apply(this, args.concat((err, value) => {
+                if (err) return reject(err);
+                resolve(value);
+            }));
         });
-    });
-
-    // write out the modified vnc.html file that works with the bundle
-    var src_html_path = path.resolve(__dirname, '..', 'vnc.html');
-    var out_html_path = path.resolve(out_dir_base, 'vnc.html');
-    fs.readFile(src_html_path, function (err, contents_raw) {
-        if (err) { throw err; }
-
-        var contents = contents_raw.toString();
-        contents = contents.replace(/="app\//g, '="');
-
-        var start_marker = '<!-- begin scripts -->\n';
-        var end_marker = '<!-- end scripts -->';
-        var start_ind = contents.indexOf(start_marker) + start_marker.length;
-        var end_ind = contents.indexOf(end_marker, start_ind);
-
-        contents = contents.slice(0, start_ind) + '<script src="app.js"></script>\n' + contents.slice(end_ind);
-
-        fs.writeFile(out_html_path, contents, function (err) {
-            if (err) { throw err; }
-            console.log("Wrote " + out_html_path);
-        });
-    });
-};
-
-var make_lib_files = function (use_require) {
-    // make sure the output directory exists
-    fse.ensureDir(lib_dir_base);
-
-    var through = require('through2');
-
-    var deps = {};
-    var rfb_file = path.join(core_path, 'rfb.js');
-    var b = make_browserify(rfb_file, {});
-    b.on('transform', function (tr, file) {
-        if (tr._is_make_module) {
-            var new_path = path.join(lib_dir_base, path.relative(core_path, file));
-            fse.ensureDir(path.dirname(new_path));
-            console.log("Writing " + new_path)
-            var fileStream = fs.createWriteStream(new_path);
-
-            if (use_require) {
-                var babelificate = babelify(file,
-                                            { plugins: ["add-module-exports", "transform-es2015-modules-commonjs"] });
-                tr.pipe(babelificate);
-                tr = babelificate;
-            }
-            tr.pipe(fileStream);
-        }
-    });
-
-    b.bundle();
-};
-
-if (program.browserify) {
-    make_full_app();
-} else {
-    make_lib_files(program.asRequire);
+    };
 }
+
+const writeFile = promisify(fs.writeFile);
+
+const readdir = promisify(fs.readdir);
+const lstat = promisify(fs.lstat);
+
+const ensureDir = promisify(fse.ensureDir);
+
+const babelTransformFile = promisify(babel.transformFile);
+
+// walkDir *recursively* walks directories trees,
+// calling the callback for all normal files found.
+function walkDir(basePath, cb, filter) {
+    return readdir(basePath)
+        .then((files) => {
+            const paths = files.map(filename => path.join(basePath, filename));
+            return Promise.all(paths.map(filepath => lstat(filepath)
+                .then((stats) => {
+                    if (filter !== undefined && !filter(filepath, stats)) return;
+
+                    if (stats.isSymbolicLink()) return;
+                    if (stats.isFile()) return cb(filepath);
+                    if (stats.isDirectory()) return walkDir(filepath, cb, filter);
+                })));
+        });
+}
+
+function makeLibFiles(sourceMaps) {
+    // NB: we need to make a copy of babelOpts, since babel sets some defaults on it
+    const babelOpts = () => ({
+        plugins: [],
+        presets: [
+            [ '@babel/preset-env',
+              { modules: 'commonjs' } ]
+        ],
+        ast: false,
+        sourceMaps: sourceMaps,
+    });
+
+    fse.ensureDirSync(paths.libDirBase);
+
+    const outFiles = [];
+
+    const handleDir = (vendorRewrite, inPathBase, filename) => Promise.resolve()
+        .then(() => {
+            const outPath = path.join(paths.libDirBase, path.relative(inPathBase, filename));
+
+            if (path.extname(filename) !== '.js') {
+                return;  // skip non-javascript files
+            }
+            return Promise.resolve()
+                .then(() => ensureDir(path.dirname(outPath)))
+                .then(() => {
+                    const opts = babelOpts();
+            // Adjust for the fact that we move the core files relative
+            // to the vendor directory
+                    if (vendorRewrite) {
+                        opts.plugins.push(["import-redirect",
+                                           {"root": paths.libDirBase,
+                                            "redirect": { "vendor/(.+)": "./vendor/$1"}}]);
+                    }
+
+                    return babelTransformFile(filename, opts)
+                        .then((res) => {
+                            console.log(`Writing ${outPath}`);
+                            const {map} = res;
+                            let {code} = res;
+                            if (sourceMaps === true) {
+                    // append URL for external source map
+                                code += `\n//# sourceMappingURL=${path.basename(outPath)}.map\n`;
+                            }
+                            outFiles.push(`${outPath}`);
+                            return writeFile(outPath, code)
+                                .then(() => {
+                                    if (sourceMaps === true || sourceMaps === 'both') {
+                                        console.log(`  and ${outPath}.map`);
+                                        outFiles.push(`${outPath}.map`);
+                                        return writeFile(`${outPath}.map`, JSON.stringify(map));
+                                    }
+                                });
+                        });
+                });
+        });
+
+    Promise.resolve()
+        .then(() => {
+            const handler = handleDir.bind(null, false, paths.main);
+            return walkDir(paths.vendor, handler);
+        })
+        .then(() => {
+            const handler = handleDir.bind(null, true, paths.core);
+            return walkDir(paths.core, handler);
+        })
+        .catch((err) => {
+            console.error(`Failure converting modules: ${err}`);
+            process.exit(1);
+        });
+}
+
+if (program.clean) {
+    console.log(`Removing ${paths.libDirBase}`);
+    fse.removeSync(paths.libDirBase);
+}
+
+makeLibFiles(program.withSourceMaps);
