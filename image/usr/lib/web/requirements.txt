@@ -4,7 +4,7 @@ Jinja2>=2.8.1
 MarkupSafe==0.23
 werkzeug>=0.15.3
 argparse>=1.2.1
-backports.ssl-match-hostname==3.4.0.2
+backports.ssl-match-hostname==3.7.0.1
 docker-py==0.5.3
 gevent==20.9.0
 gevent-websocket==0.10.1
