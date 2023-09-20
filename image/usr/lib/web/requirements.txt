@@ -12,6 +12,6 @@ greenlet==0.4.17
 itsdangerous==0.24
 peewee==2.4.1
 requests>=2.20.0
-six==1.8.0
+six==1.16.0
 websocket-client>=0.21.0
 websockify
