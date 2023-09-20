@@ -10,7 +10,7 @@ gevent==20.9.0
 gevent-websocket==0.10.1
 greenlet==0.4.17
 itsdangerous==0.24
-peewee==2.4.1
+peewee==2.10.2
 requests>=2.20.0
 six==1.8.0
 websocket-client>=0.21.0
