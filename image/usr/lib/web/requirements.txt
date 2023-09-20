@@ -5,7 +5,7 @@ MarkupSafe==0.23
 werkzeug>=0.15.3
 argparse>=1.2.1
 backports.ssl-match-hostname==3.7.0.1
-docker-py==0.7.2
+docker-py==1.10.6
 gevent==23.9.1
 gevent-websocket==0.10.1
 greenlet==0.4.17
