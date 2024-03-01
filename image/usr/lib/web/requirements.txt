@@ -9,7 +9,7 @@ docker-py==1.10.6
 gevent==24.2.1
 gevent-websocket==0.10.1
 greenlet==0.4.17
-itsdangerous==0.24
+itsdangerous==2.1.2
 peewee==2.10.2
 requests>=2.20.0
 six==1.16.0
