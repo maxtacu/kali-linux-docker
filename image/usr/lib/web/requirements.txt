@@ -8,7 +8,7 @@ backports.ssl-match-hostname==3.7.0.1
 docker-py==1.10.6
 gevent==24.2.1
 gevent-websocket==0.10.1
-greenlet==0.4.17
+greenlet==3.0.3
 itsdangerous==0.24
 peewee==2.10.2
 requests>=2.20.0
